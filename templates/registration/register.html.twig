@@ -2,128 +2,100 @@
 
 {% block title %}Inscription{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/auth.css') }}">
+{% endblock %}
+
 {% block body %}
-    {% for flash_error in app.flashes('verify_email_error') %}
-        <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
-    {% endfor %}
-    <div style="margin-top: 600px"></div>
-    <h1>Inscription</h1>
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <img src="{{ asset('image/logo.png') }}" alt="Logo Review Original">
+            <h1>Inscription</h1>
+        </div>
 
-    {{ form_errors(registrationForm) }}
+        {{ form_start(registrationForm) }}
+            {% if error is defined and error %}
+                <div class="alert alert-danger">{{ error }}</div>
+            {% endif %}
 
-    {{ form_start(registrationForm) }}
-        {{ form_row(registrationForm.nom) }}
-        {{ form_row(registrationForm.prenom) }}
-        {{ form_row(registrationForm.dateNaissance) }}
-        {{ form_row(registrationForm.dateInscription) }}
-        {{ form_row(registrationForm.photo) }}
-        {{ form_row(registrationForm.pseudo) }}
-        {{ form_row(registrationForm.email) }}
-        {{ form_row(registrationForm.plainPassword, {
-            label: 'Mot de passe'
-        }) }}
-        {{ form_row(registrationForm.agreeTerms) }}
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    {{ form_label(registrationForm.nom, 'Nom') }}
+                    {{ form_widget(registrationForm.nom, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(registrationForm.nom) }}
+                </div>
 
-        <button type="submit" class="btn">S'inscrire</button>
-    {{ form_end(registrationForm) }}
-    
-    <style>
-        /* Styles globaux */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f8f9fa;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-}
+                <div class="form-group col-md-6">
+                    {{ form_label(registrationForm.prenom, 'Prénom') }}
+                    {{ form_widget(registrationForm.prenom, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(registrationForm.prenom) }}
+                </div>
+            </div>
 
-form {
-    background-color: #ffffff;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    max-width: 400px;
-    width: 100%;
-    box-sizing: border-box;
-}
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    {{ form_label(registrationForm.dateNaissance, 'Date de naissance') }}
+                    {{ form_widget(registrationForm.dateNaissance, {
+                        'attr': {
+                            'class': 'form-control date-input',
+                            'placeholder': 'JJ/MM/AAAA'
+                        }
+                    }) }}
+                    {{ form_errors(registrationForm.dateNaissance) }}
+                </div>
 
-/* Titres et labels */
-h1 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-    color: #343a40;
-    text-align: center;
-}
+                <div class="form-group col-md-6">
+                    {{ form_label(registrationForm.dateInscription, 'Date d\'inscription') }}
+                    {{ form_widget(registrationForm.dateInscription, {
+                        'attr': {
+                            'class': 'form-control date-input',
+                            'placeholder': 'JJ/MM/AAAA'
+                        }
+                    }) }}
+                    {{ form_errors(registrationForm.dateInscription) }}
+                </div>
+            </div>
 
-label {
-    display: block;
-    margin-top: 1rem;
-    font-size: 0.9rem;
-    font-weight: bold;
-    color: #495057;
-}
+            <div class="form-group">
+                {{ form_label(registrationForm.photo, 'Photo de profil') }}
+                {{ form_widget(registrationForm.photo, {'attr': {'class': 'form-control-file'}}) }}
+                {{ form_errors(registrationForm.photo) }}
+            </div>
 
-/* Champs de formulaire */
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="checkbox"] {
-    width: 100%;
-    padding: 0.75rem;
-    margin-top: 0.5rem;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
-    box-sizing: border-box;
-    font-size: 1rem;
-}
+            <div class="form-group">
+                {{ form_label(registrationForm.pseudo, 'Pseudo') }}
+                {{ form_widget(registrationForm.pseudo, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(registrationForm.pseudo) }}
+            </div>
 
-/* Bouton */
-button {
-    width: 100%;
-    margin-top: 1.5rem;
-    padding: 0.75rem;
-    font-size: 1rem;
-    background-color: #007bff;
-    color: #ffffff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
+            <div class="form-group">
+                {{ form_label(registrationForm.email, 'Email') }}
+                {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(registrationForm.email) }}
+            </div>
 
-button:hover {
-    background-color: #0056b3;
-}
+            <div class="form-group">
+                {{ form_label(registrationForm.plainPassword, 'Mot de passe') }}
+                {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(registrationForm.plainPassword) }}
+            </div>
 
-/* Messages d'alerte */
-.alert {
-    padding: 0.75rem;
-    margin-bottom: 1rem;
-    border-radius: 4px;
-    text-align: center;
-}
+            <div class="form-check mb-4">
+                {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input'}}) }}
+                {{ form_label(registrationForm.agreeTerms, ' Et.   J\'accepte les conditions d\'utilisation et la politique de confidentialité', {'label_html': true, 'attr': {'class': 'form-check-label'}}) }}
+                {{ form_errors(registrationForm.agreeTerms) }}
+            </div>
 
-.alert-danger {
-    background-color: #f8d7da;
-    color: #842029;
-    border: 1px solid #f5c2c7;
-}
+            <div class="mt-3">
+                <button type="submit" class="btn-auth"><span>S'inscrire</span></button>
+            </div>
 
-/* Erreurs de formulaire */
-.form-error-message {
-    color: #dc3545;
-    font-size: 0.875rem;
-    margin-top: 0.25rem;
-}
-
-/* Checkbox */
-input[type="checkbox"] {
-    width: auto;
-    margin-right: 0.5rem;
-}
-
-    </style>
+            <div class="auth-footer">
+                <p>Vous avez déjà un compte ? <a href="{{ path('app_login') }}">Se connecter</a></p>
+            </div>
+        {{ form_end(registrationForm) }}
+    </div>
+</div>
 {% endblock %}
