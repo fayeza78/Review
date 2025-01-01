@@ -11,15 +11,20 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class CommentaireController extends AbstractController
 {
     private $entityManager;
+    private $security;
 
-    public function __construct(EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        Security $security
+    ) {
         $this->entityManager = $entityManager;
+        $this->security = $security;
     }
 
     #[Route('/video/{id}/comments', name: 'video_comments_list')]
@@ -69,82 +74,52 @@ class CommentaireController extends AbstractController
     }
 
     #[Route('/commentaire/{id}/like', name: 'commentaire_like', methods: ['POST'])]
-    #[IsGranted('ROLE_USER')]
     public function like(Commentaire $commentaire): JsonResponse
     {
-        /** @var User $user */
-        $user = $this->getUser();
+        $user = $this->security->getUser();
         
-        // Si l'utilisateur a déjà disliké, on retire le dislike
-        if ($commentaire->getDislikeCom()->contains($user)) {
-            $commentaire->getDislikeCom()->removeElement($user);
-            $user->getDislikeCommentaires()->removeElement($commentaire);
-            $commentaire->setDislikesCount($commentaire->getDislikesCount() - 1);
+        if (!$user) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Vous devez être connecté pour liker un commentaire'
+            ], Response::HTTP_UNAUTHORIZED);
         }
 
-        // Toggle du like
-        if ($commentaire->getLikeCom()->contains($user)) {
-            // Retirer le like
-            $commentaire->getLikeCom()->removeElement($user);
-            $user->getLikecommentaires()->removeElement($commentaire);
-            $commentaire->setLikesCount($commentaire->getLikesCount() - 1);
-            $isLiked = false;
-        } else {
-            // Ajouter le like
-            $commentaire->getLikeCom()->add($user);
-            $user->getLikecommentaires()->add($commentaire);
-            $commentaire->setLikesCount($commentaire->getLikesCount() + 1);
-            $isLiked = true;
-        }
-
+        $commentaire->addLikeCom($user);
+        $this->entityManager->persist($commentaire);
         $this->entityManager->flush();
 
         return $this->json([
             'success' => true,
             'likes' => $commentaire->getLikesCount(),
             'dislikes' => $commentaire->getDislikesCount(),
-            'isLiked' => $isLiked,
-            'isDisliked' => false
+            'isLiked' => $commentaire->isLikedByUser($user),
+            'isDisliked' => $commentaire->isDislikedByUser($user)
         ]);
     }
 
     #[Route('/commentaire/{id}/dislike', name: 'commentaire_dislike', methods: ['POST'])]
-    #[IsGranted('ROLE_USER')]
     public function dislike(Commentaire $commentaire): JsonResponse
     {
-        /** @var User $user */
-        $user = $this->getUser();
-
-        // Si l'utilisateur a déjà liké, on retire le like
-        if ($commentaire->getLikeCom()->contains($user)) {
-            $commentaire->getLikeCom()->removeElement($user);
-            $user->getLikecommentaires()->removeElement($commentaire);
-            $commentaire->setLikesCount($commentaire->getLikesCount() - 1);
+        $user = $this->security->getUser();
+        
+        if (!$user) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Vous devez être connecté pour disliker un commentaire'
+            ], Response::HTTP_UNAUTHORIZED);
         }
 
-        // Toggle du dislike
-        if ($commentaire->getDislikeCom()->contains($user)) {
-            // Retirer le dislike
-            $commentaire->getDislikeCom()->removeElement($user);
-            $user->getDislikeCommentaires()->removeElement($commentaire);
-            $commentaire->setDislikesCount($commentaire->getDislikesCount() - 1);
-            $isDisliked = false;
-        } else {
-            // Ajouter le dislike
-            $commentaire->getDislikeCom()->add($user);
-            $user->getDislikeCommentaires()->add($commentaire);
-            $commentaire->setDislikesCount($commentaire->getDislikesCount() + 1);
-            $isDisliked = true;
-        }
-
+        $commentaire->addDislikeCom($user);
+        $this->entityManager->persist($commentaire);
         $this->entityManager->flush();
 
         return $this->json([
             'success' => true,
             'likes' => $commentaire->getLikesCount(),
             'dislikes' => $commentaire->getDislikesCount(),
-            'isLiked' => false,
-            'isDisliked' => $isDisliked
+            'isLiked' => $commentaire->isLikedByUser($user),
+            'isDisliked' => $commentaire->isDislikedByUser($user)
         ]);
     }
 }

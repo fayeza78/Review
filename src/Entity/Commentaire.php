@@ -30,10 +30,10 @@ class Commentaire
     #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'dislikeCommentaires')]
     private $dislikeCom;
 
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: 'integer', options: ['default' => 0])]
     private $likesCount = 0;
 
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: 'integer', options: ['default' => 0])]
     private $dislikesCount = 0;
 
     #[ORM\ManyToOne(targetEntity: Video::class, inversedBy: 'commentaires')]
@@ -46,8 +46,6 @@ class Commentaire
         $this->likeCom = new ArrayCollection();
         $this->dislikeCom = new ArrayCollection();
         $this->datePublication = new \DateTime();
-        $this->likesCount = 0;
-        $this->dislikesCount = 0;
     }
 
     public function getId(): ?int
@@ -116,22 +114,14 @@ class Commentaire
      */
     public function addLikeCom(User $user): self
     {
-        // Si l'utilisateur a déjà liké, on ne fait rien
-        if ($this->likeCom->contains($user)) {
+        // Si l'utilisateur a déjà liké ou disliké, on ne fait rien
+        if ($this->likeCom->contains($user) || $this->dislikeCom->contains($user)) {
             return $this;
         }
 
-        // Si l'utilisateur a disliké, on retire le dislike
-        if ($this->dislikeCom->contains($user)) {
-            $this->dislikeCom->removeElement($user);
-            $user->removeDislikeCommentaire($this);
-            $this->dislikesCount = max(0, $this->dislikesCount - 1);
-        }
-
-        // Ajoute le like
-        $this->likeCom[] = $user;
+        // Ajouter le like
+        $this->likeCom->add($user);
         $user->addLikecommentaire($this);
-        $this->likesCount = $this->likeCom->count();
 
         return $this;
     }
@@ -140,7 +130,6 @@ class Commentaire
     {
         if ($this->likeCom->removeElement($user)) {
             $user->removeLikecommentaire($this);
-            $this->likesCount = max(0, $this->likeCom->count());
         }
         return $this;
     }
@@ -158,22 +147,14 @@ class Commentaire
      */
     public function addDislikeCom(User $user): self
     {
-        // Si l'utilisateur a déjà disliké, on ne fait rien
-        if ($this->dislikeCom->contains($user)) {
+        // Si l'utilisateur a déjà liké ou disliké, on ne fait rien
+        if ($this->likeCom->contains($user) || $this->dislikeCom->contains($user)) {
             return $this;
         }
 
-        // Si l'utilisateur a liké, on retire le like
-        if ($this->likeCom->contains($user)) {
-            $this->likeCom->removeElement($user);
-            $user->removeLikecommentaire($this);
-            $this->likesCount = max(0, $this->likesCount - 1);
-        }
-
-        // Ajoute le dislike
-        $this->dislikeCom[] = $user;
+        // Ajouter le dislike
+        $this->dislikeCom->add($user);
         $user->addDislikeCommentaire($this);
-        $this->dislikesCount = $this->dislikeCom->count();
 
         return $this;
     }
@@ -182,43 +163,18 @@ class Commentaire
     {
         if ($this->dislikeCom->removeElement($user)) {
             $user->removeDislikeCommentaire($this);
-            $this->dislikesCount = max(0, $this->dislikeCom->count());
         }
         return $this;
     }
 
     public function getLikesCount(): int
     {
-        return $this->likesCount;
-    }
-
-    public function setLikesCount(int $count): self
-    {
-        $this->likesCount = $count;
-        return $this;
+        return $this->likeCom->count();
     }
 
     public function getDislikesCount(): int
     {
-        return $this->dislikesCount;
-    }
-
-    public function setDislikesCount(int $count): self
-    {
-        $this->dislikesCount = $count;
-        return $this;
-    }
-
-    public function updateLikesCount(): self
-    {
-        $this->likesCount = $this->likeCom->count();
-        return $this;
-    }
-
-    public function updateDislikesCount(): self
-    {
-        $this->dislikesCount = $this->dislikeCom->count();
-        return $this;
+        return $this->dislikeCom->count();
     }
 
     public function getVideo(): ?Video
