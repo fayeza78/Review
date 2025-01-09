@@ -3,108 +3,41 @@
 {% block title %}Profil de {{ user.pseudo }}{% endblock %}
 
 {% block body %}
-<div class="container mt-5">
-<<<<<<< HEAD
-    <h1>Profil de {{ user.pseudo }}</h1>
-    <div class="row">
-        <div class="col-md-4">
-            {% if user.photo %}
-                <img src="{{ asset('uploads/photos/' ~ user.photo) }}" alt="Photo de {{ user.pseudo }}" class="img-fluid rounded-circle">
-            {% else %}
-                <img src="{{ asset('uploads/photos/default.png') }}" alt="Photo par défaut" class="img-fluid rounded-circle">
-            {% endif %}
-        </div>
-        <div class="col-md-8">
-            <p><strong>Nom :</strong> {{ user.nom }}</p>
-            <p><strong>Prénom :</strong> {{ user.prenom }}</p>
-            <p><strong>Email :</strong> {{ user.email }}</p>
-            <p><strong>Pseudo :</strong> {{ user.pseudo }}</p>
-            <p><strong>Date de naissance :</strong> {{ user.dateNaissance|date('d/m/Y') }}</p>
-            <p><strong>Date d'inscription :</strong> {{ user.dateInscription|date('d/m/Y') }}</p>
-        </div>
+<style></style>
+<div class="container mt-5 pt-5">
+    <!-- Profil Header -->
+    <div class="profile-header text-center py-5">
+        {% if user.photo %}
+            <img src="{{ asset('uploads/photos/' ~ user.photo) }}" alt="Photo de {{ user.pseudo }}" class="profile-img">
+        {% else %}
+            <img src="{{ asset('uploads/photos/default.png') }}" alt="Photo par défaut" class="profile-img">
+        {% endif %}
+        <h1 class="text-light mt-3">{{ user.pseudo }}</h1>
+        <p class="text-secondary">Membre depuis le {{ user.dateInscription|date('d M Y') }}</p>
     </div>
 
-    <!-- Formulaire de modification -->
-            <div class="col-md-6">
-                <h3>Modifier vos informations</h3>
-                {{ form_start(form) }}
-                    {{ form_row(form.email) }}
-                    {{ form_row(form.nom) }}
-                    {{ form_row(form.prenom) }}
-                    {{ form_row(form.pseudo) }}
-                    <div class="text-end">
-                        {{ form_row(form.submit) }}
-                    </div>
-                {{ form_end(form) }}
-            </div>
-
-    <h2 class="mt-4">Activité récente</h2>
-    <div class="row">
+    <!-- Informations et statistiques -->
+    <div class="row mt-4">
+        <!-- Informations de l'utilisateur -->
         <div class="col-md-6">
-            <h3>Commentaires</h3>
-            <ul>
-                {% for commentaire in user.commentaires %}
-                    <li>{{ commentaire.content|slice(0, 100) }}...</li>
-                {% else %}
-                    <li>Aucun commentaire pour l'instant.</li>
-                {% endfor %}
-            </ul>
-        </div>
-        <div class="col-md-6">
-            <h3>Vidéos likées</h3>
-            <ul>
-                {% for video in user.videos %}
-                    <li>{{ video.title }}</li>
-                {% else %}
-                    <li>Aucune vidéo likée pour l'instant.</li>
-                {% endfor %}
-            </ul>
-=======
-    <!-- En-tête du profil -->
-    <div class="row align-items-center">
-        <div class="col-md-3 text-center">
-            {% if user.photo %}
-                <img src="{{ asset('uploads/photos/' ~ user.photo) }}" alt="Photo de {{ user.pseudo }}" class="img-fluid rounded-circle shadow-lg" style="width: 150px; height: 150px; object-fit: cover;">
-            {% else %}
-                <img src="{{ asset('uploads/photos/default.png') }}" alt="Photo par défaut" class="img-fluid rounded-circle shadow-lg" style="width: 150px; height: 150px; object-fit: cover;">
-            {% endif %}
-        </div>
-        <div class="col-md-9">
-            <h1 class="display-4">{{ user.pseudo }}</h1>
-            <p class="text-muted">Membre depuis le {{ user.dateInscription|date('d M Y') }}</p>
-            <p>
-                <strong>Email :</strong> {{ user.email }}<br>
-                <strong>Date de naissance :</strong> {{ user.dateNaissance|date('d/m/Y') }}
-            </p>
-            <a href="#edit-profile" class="btn btn-outline-primary btn-sm mt-2">Modifier mon profil</a>
-        </div>
-    </div>
-
-    <hr class="my-4">
-
-    <!-- Statistiques et activité -->
-    <div class="row text-center mt-4">
-        <div class="col-md-4">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <h5 class="card-title">Commentaires</h5>
-                    <p class="card-text display-6">{{ user.commentaires|length }}</p>
+                    <h3 class="card-title text-primary">Informations</h3>
+                    <p><strong>Nom :</strong> {{ user.nom }}</p>
+                    <p><strong>Prénom :</strong> {{ user.prenom }}</p>
+                    <p><strong>Email :</strong> {{ user.email }}</p>
+                    <p><strong>Date de naissance :</strong> {{ user.dateNaissance|date('d/m/Y') }}</p>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+
+        <!-- Statistiques -->
+        <div class="col-md-6">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <h5 class="card-title">Vidéos likées</h5>
-                    <p class="card-text display-6">{{ user.videos|length }}</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Vidéos publiées</h5>
-                    <p class="card-text display-6">--</p>
+                    <h3 class="card-title text-primary">Statistiques</h3>
+                    <p><strong>Commentaires :</strong> {{ user.commentaires|length }}</p>
+                    <p><strong>Vidéos likées :</strong> {{ user.videos|length }}</p>
                 </div>
             </div>
         </div>
@@ -112,23 +45,17 @@
 
     <!-- Formulaire de modification -->
     <div id="edit-profile" class="mt-5">
-        <h2>Modifier vos informations</h2>
+        <h2 class="text-light">Modifier vos informations</h2>
         <div class="card shadow-sm">
             <div class="card-body">
                 {{ form_start(form) }}
-                <div class="row">
-                    <div class="col-md-6">
-                        {{ form_row(form.email) }}
-                        {{ form_row(form.nom) }}
+                    {{ form_row(form.email) }}
+                    {{ form_row(form.nom) }}
+                    {{ form_row(form.prenom) }}
+                    {{ form_row(form.pseudo) }}
+                    <div class="text-end">
+                        {{ form_row(form.submit, {'attr': {'class': 'btn btn-primary'}}) }}
                     </div>
-                    <div class="col-md-6">
-                        {{ form_row(form.prenom) }}
-                        {{ form_row(form.pseudo) }}
-                    </div>
-                </div>
-                <div class="text-end mt-3">
-                    {{ form_row(form.submit, { 'label': 'Sauvegarder les modifications' }) }}
-                </div>
                 {{ form_end(form) }}
             </div>
         </div>
@@ -136,15 +63,15 @@
 
     <!-- Activité récente -->
     <div class="mt-5">
-        <h2>Activité récente</h2>
+        <h2 class="text-light">Activité récente</h2>
         <div class="row">
             <div class="col-md-6">
-                <h3>Commentaires</h3>
+                <h3 class="text-primary">Commentaires</h3>
                 <div class="list-group shadow-sm">
                     {% for commentaire in user.commentaires %}
                         <div class="list-group-item">
-                            <p class="mb-1">{{ commentaire.content|slice(0, 100) ~ '...' }}</p>
-                            <small class="text-muted">Publié le {{ commentaire.createdAt|date('d/m/Y à H:i') }}</small>
+                            <p>{{ commentaire.contenu|slice(0, 100) ~ '...' }}</p>
+                            <small class="text-muted">Publié le {{ commentaire.datePublication|date('d/m/Y à H:i') }}</small>
                         </div>
                     {% else %}
                         <div class="list-group-item text-muted">Aucun commentaire pour l'instant.</div>
@@ -152,19 +79,18 @@
                 </div>
             </div>
             <div class="col-md-6">
-                <h3>Vidéos likées</h3>
+                <h3 class="text-primary">Vidéos likées</h3>
                 <div class="list-group shadow-sm">
                     {% for video in user.videos %}
                         <a href="#" class="list-group-item list-group-item-action">
-                            <strong>{{ video.title }}</strong>
-                            <small class="text-muted">Ajoutée le {{ video.createdAt|date('d/m/Y') }}</small>
+                            <strong>{{ video.titre }}</strong>
+                            <small class="text-muted">Ajoutée le {{ video.datePublication|date('d/m/Y') }}</small>
                         </a>
                     {% else %}
                         <div class="list-group-item text-muted">Aucune vidéo likée pour l'instant.</div>
                     {% endfor %}
                 </div>
             </div>
->>>>>>> origin
         </div>
     </div>
 </div>
